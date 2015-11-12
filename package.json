@@ -1,0 +1,14 @@
+{
+  "name": "guarantor",
+  "version": "0.0.0",
+  "description": "guarantees things will happen, even if we are interrupted",
+  "main": "guarantor.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erikpukinskis/guarantor.git"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "license": "ISC"
+}
