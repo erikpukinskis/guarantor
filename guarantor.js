@@ -63,7 +63,6 @@ var cleaning = false
 function cleanUp(callback) {
   process.stdin.resume()
 
-  console.log("cleanUp")
   if (cleaning) {
     if (willGetStuck) {
       console.log("Finished cleaning up. Hit ctrl+c again to exit")
