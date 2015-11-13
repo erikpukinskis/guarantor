@@ -35,13 +35,15 @@ function cleanUpOnExit(guaranteeId) {
 
   dirtyItems[guaranteeId] = {}
 
-  process.on('exit', cleanUp)
+  process.on('exit', function() {
+    cleanUp()
+  })
 
-  process.on('SIGINT',
-    cleanUp.bind(null,
-      process.exit.bind(null, 2)
-    )
-  )
+  process.on('SIGINT', function() {
+    cleanUp(function() {
+      process.exit(2)
+    })
+  })
 
   process.on('uncaughtException',
     function(error) {
@@ -52,6 +54,7 @@ function cleanUpOnExit(guaranteeId) {
       })
     }
   )
+
 }
 
 var willGetStuck = true
@@ -60,6 +63,7 @@ var cleaning = false
 function cleanUp(callback) {
   process.stdin.resume()
 
+  console.log("cleanUp")
   if (cleaning) {
     if (willGetStuck) {
       console.log("Finished cleaning up. Hit ctrl+c again to exit")
@@ -74,7 +78,7 @@ function cleanUp(callback) {
   function cleanAnother() {
     var guaranteeId = ids.pop()
     if (!guaranteeId) {
-      return callback()
+      return callback && callback()
     }
     cleanUpItems(
       dirtyItems[guaranteeId],

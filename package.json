@@ -1,7 +1,7 @@
 {
   "name": "guarantor",
   "version": "0.2.0",
-  "description": "guarantees things will happen, even if we are interrupted",
+  "description": "Guarantees things will happen, even if we are interrupted",
   "main": "guarantor.js",
   "repository": {
     "type": "git",
