@@ -3,8 +3,13 @@ Guarantees things will happen, even if an error is thrown or the process is kill
 ~~~javascript
 var guarantor = require("guarantor")
 
-guarantor(function(callback) {
-  your.cleanup.code(callback)
+guarantor(function(callback, status) {
+
+  yourCleanupFunction(callback)
+
+  if (status == 0) {
+    console.log("Log an error here if you were hoping to do something asynchronously. Node is exiting.")
+  }
 }
 ~~~
 
