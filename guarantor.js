@@ -10,10 +10,6 @@ function guarantor(cleaner) {
 
 function cleanUpOnExit() {
 
-  process.on('exit', function() {
-    cleanUp()
-  })
-
   process.on('SIGINT', function() {
     cleanUp(function() {
       process.exit(2)
@@ -32,27 +28,15 @@ function cleanUpOnExit() {
 
 }
 
-var willGetStuck = true
-var cleaning = false
-
 function cleanUp(callback) {
-
-  if (cleaning) {
-    if (willGetStuck) {
-      console.log("Finished cleaning up. Hit ctrl+c again to exit")
-    }
-    return
-  }
-
   var returned = {}
-  process.stdin.resume()
 
   function clockOut(index) {
     returned[index] = true
     for(var i=0; i<cleaners.length; i++) {
       if (!returned[i]) { return }
     }
-    callback()
+    callback && callback()
   }
 
   for(var i=0; i<cleaners.length; i++){
