@@ -7,7 +7,7 @@ var authors = [
 ]
 
 guarantor(
-  function(callback) {
+  function(callback, status) {
     setTimeout(function() {
       var i = Math.floor(Math.random()*3)
       console.log("\n", authors[i], "is a great author!\n")

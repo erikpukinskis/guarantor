@@ -12,7 +12,7 @@ function guarantor(cleaner) {
 function cleanUpOnExit() {
 
   process.on('exit', function() {
-    cleanUp()
+    cleanUp(0)
 
     var remaining = oneRemaining()
 
@@ -24,14 +24,14 @@ function cleanUpOnExit() {
   })
 
   process.on('SIGINT', function() {
-    cleanUp(function() {
+    cleanUp(2, function() {
       process.exit(2)
     })
   })
 
   process.on('uncaughtException',
     function(error) {
-      cleanUp(function() {
+      cleanUp(99, function() {
         willGetStuck = false
         console.log(error.stack)
         process.exit(99)
@@ -41,7 +41,7 @@ function cleanUpOnExit() {
 
 }
 
-function cleanUp(callback) {
+function cleanUp(status, callback) {
   function markFinished(index) {
     returned[index] = true
     if (!oneRemaining()) {
@@ -50,7 +50,8 @@ function cleanUp(callback) {
   }
 
   for(var i=0; i<cleaners.length; i++){
-    cleaners[i](markFinished.bind(null, i))
+    var finishThis = markFinished.bind(null, i)
+    cleaners[i](finishThis, status)
   }
 }
 
