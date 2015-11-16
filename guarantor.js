@@ -2,6 +2,7 @@
 module.exports = guarantor
 
 var cleaners = []
+var returned = {}
 
 function guarantor(cleaner) {
   cleaners.push(cleaner)
@@ -9,6 +10,18 @@ function guarantor(cleaner) {
 }
 
 function cleanUpOnExit() {
+
+  process.on('exit', function() {
+    cleanUp()
+
+    var remaining = oneRemaining()
+
+    if (remaining) {
+      var nice = remaining.toString().replace(/[\n\s]+/g, " ")
+
+      console.log("\nYou wanted to guarantee that "+nice+" ran, but it seems to be doing something asynchronous and Node is shutting down NOW! We tried our best!")
+    }
+  })
 
   process.on('SIGINT', function() {
     cleanUp(function() {
@@ -29,18 +42,24 @@ function cleanUpOnExit() {
 }
 
 function cleanUp(callback) {
-  var returned = {}
-
-  function clockOut(index) {
+  function markFinished(index) {
     returned[index] = true
-    for(var i=0; i<cleaners.length; i++) {
-      if (!returned[i]) { return }
+    if (!oneRemaining()) {
+      callback && callback()
     }
-    callback && callback()
   }
 
   for(var i=0; i<cleaners.length; i++){
-    cleaners[i](clockOut.bind(null, i))
+    cleaners[i](markFinished.bind(null, i))
   }
+}
+
+function oneRemaining() {
+  for(var i=0; i<cleaners.length; i++) {
+    if (!returned[i]) {
+      return cleaners[i]
+    }
+  }
+  return false
 }
 

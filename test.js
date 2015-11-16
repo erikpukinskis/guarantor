@@ -16,8 +16,13 @@ guarantor(
   }
 )
 
-console.log("Press ctrl+c to kill this process. You should see some publicity for someone!")
+var arg = process.argv.slice(2).join(" ")
+if (arg == "normal exit") {
+  console.log("Exiting normally... You should see an apology.")
+} else {
+  console.log("Press ctrl+c to kill this process. You should see some publicity for someone!")
 
-var timeout = setTimeout(function() {
-  throw new Error("You waited too long! But we threw an error so you should still have seen a promo.")
-}, 3000)
+  var timeout = setTimeout(function() {
+    throw new Error("You waited too long! But we threw an error so you should still have seen a promo.")
+  }, 3000)
+}
