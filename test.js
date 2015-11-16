@@ -1,24 +1,22 @@
 var guarantor = require("./")
 
-var guaranteePublicity = guarantor(
-  function(person, name) {
-    console.log(name, "who is", person.age, "exists!")
-    clearTimeout(timeout)
-  },
-  "publications"
-)
+var authors = [
+  "Ursula K. Leguin",
+  "Octavia Butler",
+  "Margaret Atwood"
+]
 
-guaranteePublicity(
-  {age: 12},
-  "betty draper"
-)
+guarantor(
+  function(callback) {
+    setTimeout(function() {
+      var i = Math.floor(Math.random()*3)
 
-guaranteePublicity(
-  {age: 4000},
-  "the earth"
+      console.log(authors[i], "is a great author!")
+      
+      callback()
+    }, 100)
+  }
 )
-
-guaranteePublicity.forget("the earth")
 
 console.log("Press ctrl+c to kill this process. You should see some publicity for someone!")
 

@@ -1,39 +1,14 @@
 
-var dirtyItems = {}
-var cleaners = {}
-
 module.exports = guarantor
 
-function guarantor(cleaner, label) {
-  cleaner.label = label
+var cleaners = []
 
-  var guaranteeId = Math.random().toString(36).split(".")[1].slice(0,5)
-
-  cleaners[guaranteeId] = cleaner
-
-  var boundGuarantee = guarantee.bind(null, guaranteeId)
-
-  boundGuarantee.forget = forget.bind(null, guaranteeId)
-
-  return boundGuarantee
+function guarantor(cleaner) {
+  cleaners.push(cleaner)
+  cleanUpOnExit()
 }
 
-function guarantee(guaranteeId, dirtyItem, id) {
-  cleanUpOnExit(guaranteeId)
-  dirtyItems[guaranteeId][id] = dirtyItem
-}
-
-function forget(guaranteeId, id) {
-  delete dirtyItems[guaranteeId][id]
-}
-
-function cleanUpOnExit(guaranteeId) {
-
-  if (dirtyItems[guaranteeId]) {
-    return
-  }
-
-  dirtyItems[guaranteeId] = {}
+function cleanUpOnExit() {
 
   process.on('exit', function() {
     cleanUp()
@@ -61,7 +36,6 @@ var willGetStuck = true
 var cleaning = false
 
 function cleanUp(callback) {
-  process.stdin.resume()
 
   if (cleaning) {
     if (willGetStuck) {
@@ -69,43 +43,20 @@ function cleanUp(callback) {
     }
     return
   }
-  cleaning = true
-  var explained = false
 
-  var ids = Object.keys(cleaners)
+  var returned = {}
+  process.stdin.resume()
 
-  function cleanAnother() {
-    var guaranteeId = ids.pop()
-    if (!guaranteeId) {
-      return callback && callback()
+  function clockOut(index) {
+    returned[index] = true
+    for(var i=0; i<cleaners.length; i++) {
+      if (!returned[i]) { return }
     }
-    cleanUpItems(
-      dirtyItems[guaranteeId],
-      cleaners[guaranteeId],
-      cleanAnother
-    )
+    callback()
   }
 
-  cleanAnother()
-}
-
-function cleanUpItems(items, cleaner, callback) {
-  var ids = Object.keys(items)
-
-  if (ids.length) {
-    console.log("\nWe have", ids.length, (cleaner.label||"item")+"(s) still to clean up. Working on it... hit ctrl+c to give up")
+  for(var i=0; i<cleaners.length; i++){
+    cleaners[i](clockOut.bind(null, i))
   }
-
-  function resignMore() {
-    var id = ids.pop()
-
-    if (!id) {
-      return callback()
-    }
-    var item = items[id]
-    cleaner(item, id, resignMore)
-  }
-
-  resignMore()
 }
 
