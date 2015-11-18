@@ -34,9 +34,9 @@ function cleanUpOnExit() {
 
   process.on('uncaughtException',
     function(error) {
+      console.log(error.stack, "\n")
       cleanUp(99, function() {
         willGetStuck = false
-        console.log(error.stack)
         process.exit(99)
       })
     }
