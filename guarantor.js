@@ -27,6 +27,7 @@ function cleanUpOnExit() {
   })
 
   process.on('SIGINT', function() {
+    if (cleaning) { return }
     cleanUp(2, function() {
       process.exit(2)
     })
@@ -34,6 +35,7 @@ function cleanUpOnExit() {
 
   process.on('uncaughtException',
     function(error) {
+      if (cleaning) { return }
       console.log(error.stack, "\n")
       cleanUp(99, function() {
         willGetStuck = false
